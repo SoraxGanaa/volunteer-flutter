@@ -1,4 +1,4 @@
-class OrgSummary {
+﻿class OrgSummary {
   final String id;
   final String name;
   final String status;
@@ -19,10 +19,21 @@ class MyOrgsResponse {
   MyOrgsResponse({required this.orgs});
 
   factory MyOrgsResponse.fromJson(dynamic data) {
-    // backend чинь {orgs:[...]} эсвэл {items:[...]} байж магадгүй.
-    // ихэнхдээ {orgs:[...]} гэж үзээд:
     final map = data as Map<String, dynamic>;
-    final list = (map['orgs'] as List).cast<Map<String, dynamic>>();
+    final raw = (map['orgs'] ?? map['items'] ?? []) as List;
+    final list = raw.cast<Map<String, dynamic>>();
     return MyOrgsResponse(orgs: list.map(OrgSummary.fromJson).toList());
   }
+}
+
+class CreateOrgRequest {
+  final String name;
+  final String? description;
+
+  CreateOrgRequest({required this.name, this.description});
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        if (description != null && description!.isNotEmpty) 'description': description,
+      };
 }

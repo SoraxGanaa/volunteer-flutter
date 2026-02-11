@@ -10,4 +10,8 @@ class OrgRepo {
     final res = await _dio.get('/orgs/my');
     return MyOrgsResponse.fromJson(res.data).orgs;
   }
+
+  Future<void> createOrg(CreateOrgRequest req) async {
+    await _dio.post('/orgs', data: req.toJson());
+  }
 }

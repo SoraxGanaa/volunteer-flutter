@@ -1,4 +1,4 @@
-enum UserRole { SUPERADMIN, ORG_ADMIN, USER }
+enum UserRole { SUPERADMIN, ORG_ADMIN, ORG_STAFF, USER }
 
 UserRole userRoleFromString(String value) {
   switch (value) {
@@ -6,6 +6,8 @@ UserRole userRoleFromString(String value) {
       return UserRole.SUPERADMIN;
     case 'ORG_ADMIN':
       return UserRole.ORG_ADMIN;
+    case 'ORG_STAFF':
+      return UserRole.ORG_STAFF;
     case 'USER':
       return UserRole.USER;
     default:
@@ -30,22 +32,56 @@ class AuthUser {
   final UserRole role;
   final String email;
   final String? phone;
+  final String? firstName;
+  final String? lastName;
 
   AuthUser({
     required this.id,
     required this.role,
     required this.email,
     this.phone,
+    this.firstName,
+    this.lastName,
   });
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
+    final roleRaw = json['role'];
+    final roleValue = roleRaw is Map<String, dynamic>
+        ? (roleRaw['name']?.toString() ?? 'USER')
+        : (roleRaw?.toString() ?? (json['role_name']?.toString() ?? 'USER'));
     return AuthUser(
       id: json['id'].toString(),
-      role: userRoleFromString(json['role'] as String),
+      role: userRoleFromString(roleValue),
       email: (json['email'] as String?) ?? '',
       phone: json['phone'] as String?,
+      firstName: json['first_name'] as String?,
+      lastName: json['last_name'] as String?,
     );
   }
+}
+
+class RegisterRequest {
+  final String? email;
+  final String? phone;
+  final String password;
+  final String? firstName;
+  final String? lastName;
+
+  RegisterRequest({
+    this.email,
+    this.phone,
+    required this.password,
+    this.firstName,
+    this.lastName,
+  });
+
+  Map<String, dynamic> toJson() => {
+        if (email != null && email!.isNotEmpty) 'email': email,
+        if (phone != null && phone!.isNotEmpty) 'phone': phone,
+        'password': password,
+        if (firstName != null && firstName!.isNotEmpty) 'firstName': firstName,
+        if (lastName != null && lastName!.isNotEmpty) 'lastName': lastName,
+      };
 }
 
 class LoginResponse {
@@ -57,7 +93,7 @@ class LoginResponse {
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
       user: AuthUser.fromJson(json['user'] as Map<String, dynamic>),
-      accessToken: json['accessToken'] as String,
+      accessToken: (json['accessToken'] ?? json['access_token']) as String,
     );
   }
 }

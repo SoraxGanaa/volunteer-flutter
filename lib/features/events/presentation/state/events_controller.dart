@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../auth/presentation/state/auth_controller.dart';
 import '../../data/models/event_models.dart';
 import '../../data/repos/event_repo.dart';
@@ -17,7 +17,7 @@ class EventsController extends Notifier<AsyncValue<List<EventSummary>>> {
     try {
       final repo = ref.read(eventRepoProvider);
 
-      // ✅ public list (published only)
+      // public list (published only)
       final list = await repo.publicEvents(city: city, q: q, orgId: orgId);
 
       state = AsyncValue.data(list);

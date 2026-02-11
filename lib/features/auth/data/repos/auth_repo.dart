@@ -22,5 +22,10 @@ class AuthRepo {
     return AuthUser.fromJson(res.data as Map<String, dynamic>);
   }
 
+  Future<AuthUser> register(RegisterRequest req) async {
+    final res = await _dio.post('/auth/register', data: req.toJson());
+    return AuthUser.fromJson(res.data as Map<String, dynamic>);
+  }
+
   Future<void> logout() => _tokenStorage.clearToken();
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../app/router/router_paths.dart';
 import '../state/auth_controller.dart';
+import '../widgets/auth_text_field.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -30,14 +33,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(
+            AuthTextField(
               controller: identifierCtrl,
-              decoration: const InputDecoration(labelText: 'Email'),
+              label: 'Email or phone',
             ),
             const SizedBox(height: 12),
-            TextField(
+            AuthTextField(
               controller: passwordCtrl,
-              decoration: const InputDecoration(labelText: 'Password'),
+              label: 'Password',
               obscureText: true,
             ),
             const SizedBox(height: 16),
@@ -57,6 +60,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Text('Login'),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => context.push(RoutePaths.register),
+              child: const Text('Create account'),
             ),
           ],
         ),

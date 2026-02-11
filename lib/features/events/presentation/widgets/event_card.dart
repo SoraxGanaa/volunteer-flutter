@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/event_models.dart';
 
@@ -6,12 +6,14 @@ class EventCard extends StatelessWidget {
   final EventSummary ev;
   final VoidCallback? onTap;
   final VoidCallback? onPrimary;
+  final String primaryText;
 
   const EventCard({
     super.key,
     required this.ev,
     this.onTap,
     this.onPrimary,
+    this.primaryText = 'Бүртгүүлэх',
   });
 
   @override
@@ -31,7 +33,6 @@ class EventCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Cover image placeholder (screenshot шиг)
               ClipRRect(
                 borderRadius: BorderRadius.circular(14),
                 child: Container(
@@ -45,7 +46,6 @@ class EventCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // pill (category байхгүй тул orgName ашиглая)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
@@ -99,7 +99,7 @@ class EventCard extends StatelessWidget {
                     height: 40,
                     child: ElevatedButton(
                       onPressed: onPrimary,
-                      child: const Text('Бүртгүүлэх'),
+                      child: Text(primaryText),
                     ),
                   )
                 ],

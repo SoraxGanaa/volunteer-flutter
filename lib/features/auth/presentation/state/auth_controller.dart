@@ -32,8 +32,16 @@ final secureStorageProvider = Provider((ref) => const FlutterSecureStorage());
 final tokenStorageProvider =
     Provider((ref) => TokenStorage(ref.watch(secureStorageProvider)));
 
+final unauthorizedTickProvider = StateProvider<int>((ref) => 0);
+
 final apiClientProvider =
-    Provider((ref) => ApiClient(tokenStorage: ref.watch(tokenStorageProvider)));
+    Provider((ref) => ApiClient(
+          tokenStorage: ref.watch(tokenStorageProvider),
+          onUnauthorized: () {
+            final notifier = ref.read(unauthorizedTickProvider.notifier);
+            notifier.state = notifier.state + 1;
+          },
+        ));
 
 final authRepoProvider = Provider(
   (ref) => AuthRepo(ref.watch(apiClientProvider), ref.watch(tokenStorageProvider)),
@@ -44,7 +52,14 @@ final authControllerProvider =
 
 class AuthController extends Notifier<AuthState> {
   @override
-  AuthState build() => const AuthState();
+  AuthState build() {
+    ref.listen<int>(unauthorizedTickProvider, (prev, next) {
+      if (prev == null || next > prev) {
+        logout();
+      }
+    });
+    return const AuthState();
+  }
 
   Future<void> bootstrap() async {
     state = state.copyWith(isLoading: true, clearError: true);
@@ -65,6 +80,30 @@ class AuthController extends Notifier<AuthState> {
       state = state.copyWith(user: resp.user, isLoading: false);
     } catch (_) {
       state = state.copyWith(isLoading: false, error: 'Login failed');
+    }
+  }
+
+  Future<void> register({
+    String? email,
+    String? phone,
+    required String password,
+    String? firstName,
+    String? lastName,
+  }) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final user = await ref.read(authRepoProvider).register(
+            RegisterRequest(
+              email: email,
+              phone: phone,
+              password: password,
+              firstName: firstName,
+              lastName: lastName,
+            ),
+          );
+      state = state.copyWith(user: user, isLoading: false);
+    } catch (_) {
+      state = state.copyWith(isLoading: false, error: 'Register failed');
     }
   }
 
